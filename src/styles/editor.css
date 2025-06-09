@@ -1,0 +1,337 @@
+/*------------------------------------*\
+  #BASE STYLES & LAYOUT
+\*------------------------------------*/
+.editor-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative; /* Essential for positioning the link-input-tooltip */
+}
+
+/*------------------------------------*\
+  #BUTTONS & GROUPS
+\*------------------------------------*/
+.button-group {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.toggle-button {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  flex-grow: 1; /* Allows buttons to expand and fill space */
+}
+
+.toggle-button:hover {
+  background-color: #3e8e41; /* Darker green on hover */
+  transform: translateY(-1px); /* Slight lift effect */
+}
+
+.toggle-button.active {
+  background-color: #2E7D32; /* Even darker green when active */
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.copy-button {
+  background-color: #2196F3; /* Blue */
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.copy-button:hover {
+  background-color: #0b7dda; /* Darker blue on hover */
+}
+
+/*------------------------------------*\
+  #TOOLBAR
+\*------------------------------------*/
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem; /* Consolidated gap */
+  padding: 0.4rem; /* Consolidated padding */
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-bottom: none; /* For visual separation from editor */
+  border-radius: 8px 8px 0 0; /* Rounded top corners */
+  flex-wrap: wrap; /* Allows toolbar items to wrap to next line */
+  position: relative; /* Important for child absolute positioning like tooltip */
+}
+
+.toolbar-select {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: white;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 100px;
+  margin-right: 0.5rem; /* Space after the select dropdown */
+  height: 36px; /* Match button height for alignment */
+  transition: all 0.2s; /* Added transition for consistent hover effects */
+}
+
+.toolbar-select:hover {
+  border-color: #bbb;
+}
+
+.toolbar-select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.toolbar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; /* Fixed width for consistent button size */
+  height: 36px; /* Fixed height for consistent button size */
+  padding: 0; /* No padding needed due to fixed width/height */
+  border-radius: 4px;
+  border: 1px solid transparent; /* Default transparent border */
+  background-color: white;
+  cursor: pointer;
+  font-size: 14px; /* Icon size often dictated by SVG */
+  transition: all 0.2s;
+  color: #333; /* Default icon color */
+}
+
+.toolbar-button:hover {
+  background-color: #e0e0e0; /* Lighter grey on hover */
+  border-color: #ccc;
+  transform: scale(1.05); /* Slight scale effect on hover */
+}
+
+.toolbar-button.is-active {
+  background-color: #d0d0d0; /* Darker grey when active */
+  border-color: #bbb;
+  color: #000;
+  font-weight: bold;
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2); /* Inner shadow for active state */
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px; /* Height for visual separation */
+  background-color: #ddd;
+  margin: 0 0.3rem; /* Small margin around separator */
+}
+
+/* Specific styling for direct children (strong, em, u) within toolbar buttons if you use them */
+.toolbar-button strong { font-weight: bold; }
+.toolbar-button em { font-style: italic; }
+.toolbar-button u { text-decoration: underline; }
+
+/* Styles for icons within toolbar buttons */
+.toolbar-button svg {
+  color: inherit; /* Inherit color from parent button */
+}
+
+/*------------------------------------*\
+  #EDITOR CONTENT (TIPTAP)
+\*------------------------------------*/
+/* ProseMirror specific styles for the editable area */
+.tiptap-editor .ProseMirror {
+  border: 1px solid #ddd;
+  border-radius: 0 0 8px 8px; /* Rounded bottom corners */
+  padding: 0.5rem;
+  min-height: 300px; /* Minimum height for the editor */
+  max-height: 500px; /* Maximum height before scroll */
+  overflow-y: auto; /* Scroll when content exceeds max-height */
+  background: white;
+}
+
+.tiptap-editor .ProseMirror:focus {
+  outline: none; /* Remove default outline on focus */
+  border-color: #007bff; /* Highlight border on focus */
+}
+
+/* Base Tiptap content styles */
+.tiptap {
+  /* Add top margin to all elements after the first one (for spacing paragraphs/headings) */
+  > * + * {
+    margin-top: 0.75em;
+  }
+
+  /* Headings */
+  h1 { font-size: 2em; margin: 0.67em 0; line-height: 1.2; }
+  h2 { font-size: 1.5em; margin: 0.75em 0; line-height: 1.3; }
+  h3 { font-size: 1.17em; margin: 0.83em 0; }
+  h4 { font-size: 1em; margin: 1.12em 0; } /* Standard h4 size */
+  h5 { font-size: 0.83em; margin: 1.5em 0; } /* Standard h5 size */
+  h6 { font-size: 0.67em; margin: 2.33em 0; } /* Standard h6 size */
+
+  /* Lists */
+  ul, ol {
+    padding: 0 1rem;
+    margin: 0.75em 0; /* Add margin to lists */
+  }
+
+  /* Blockquote */
+  blockquote {
+    padding-left: 1rem;
+    border-left: 3px solid #ddd;
+    color: #666;
+    margin: 0.75em 0; /* Add margin to blockquote */
+  }
+
+  /* Code Blocks */
+  pre {
+    background: #0D0D0D; /* Dark background for code */
+    color: #FFF;
+    font-family: 'JetBrainsMono', monospace; /* Preferred code font */
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin: 0.5rem 0; /* Margin around code block */
+    overflow-x: auto; /* Horizontal scroll for long lines */
+
+    code {
+      color: inherit;
+      padding: 0;
+      background: none;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+/* Placeholder styling for empty editor */
+/* This combines your two placeholder rules into one, targeting the ProseMirror content directly */
+.tiptap .is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left; /* Ensures placeholder doesn't affect content flow */
+  color: #adb5bd;
+  pointer-events: none; /* Allows clicks to pass through to the editor */
+  height: 0; /* Prevents placeholder from adding height */
+}
+
+/*------------------------------------*\
+  #OUTPUT VIEWS (HTML/MARKDOWN)
+\*------------------------------------*/
+.output-view {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  margin-bottom: 1.5rem;
+  min-height: 300px;
+  max-height: 500px;
+  overflow: auto;
+}
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.output-view h3 {
+  margin: 0;
+  color: #333;
+}
+
+.output-view pre {
+  white-space: pre-wrap; /* Preserve whitespace and wrap long lines */
+  word-wrap: break-word; /* Break words if they are too long */
+  margin: 0;
+  padding: 1rem;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  overflow-x: auto; /* Allow horizontal scroll for preformatted text */
+}
+
+/*------------------------------------*\
+  #NOTIFICATION
+\*------------------------------------*/
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #4CAF50; /* Green */
+  color: white;
+  padding: 12px 24px;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/*------------------------------------*\
+  #LINK TOOLTIP
+\*------------------------------------*/
+.link-input-tooltip {
+  position: absolute;
+  /* Adjust top dynamically if you need it attached to the selection,
+     otherwise this fixed value works if it's relative to the toolbar */
+  top: 60px; /* Example: 60px below the top of .editor-container */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 100; /* Ensure it's above other content */
+  display: flex;
+  gap: 5px;
+}
+
+.link-input-tooltip input {
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  flex-grow: 1; /* Allows the input to fill available space */
+}
+
+.link-input-tooltip button {
+  background-color: #007bff; /* Blue */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.link-input-tooltip button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/*------------------------------------*\
+  #RESPONSIVE DESIGN
+\*------------------------------------*/
+@media (max-width: 600px) {
+  .editor-container {
+    padding: 15px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .toggle-button {
+    width: 100%; /* Full width on smaller screens */
+  }
+}

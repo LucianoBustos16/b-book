@@ -2,10 +2,27 @@
 import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
 
+import TiptapEditor from '../components/TiptapEditor.jsx';
+import '../styles/editor.css';
+
 // Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
 // Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
-	<Welcome />
+  <header>
+    <h1>Editor de Texto Enriquecido</h1>
+     <p>Escribe abajo y presiona el botón para ver el HTML generado</p>
+  </header>
+    
+    <div class="container">
+      <TiptapEditor client:load />
+    </div>
 </Layout>
+
+<style>
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  </style>
