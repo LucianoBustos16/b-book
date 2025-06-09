@@ -335,3 +335,79 @@
     width: 100%; /* Full width on smaller screens */
   }
 }
+
+/*------------------------------------*\
+  #TABLE STYLES
+\*------------------------------------*/
+/* Base Table Styling */
+.tiptap table {
+  width: 100%;
+  border-collapse: collapse; /* Collapse borders for a clean look */
+  margin: 1em 0; /* Vertical margin for tables */
+  table-layout: fixed; /* Ensures columns respect widths */
+}
+
+.tiptap th,
+.tiptap td {
+  border: 1px solid #ccc; /* Light gray border */
+  padding: 0.5em 0.8em; /* Padding inside cells */
+  text-align: left; /* Default text alignment */
+  vertical-align: top; /* Align content to the top */
+  min-width: 50px; /* Minimum width for table cells */
+  position: relative; /* Needed for resizing handles */
+}
+
+/* Header Cells */
+.tiptap th {
+  background-color: #f0f0f0; /* Light background for headers */
+  font-weight: bold;
+}
+
+/* Custom class if configured in Table extension (e.g., class: 'custom-tiptap-table') */
+.tiptap .custom-tiptap-table {
+  /* Add any specific styles for tables created by Tiptap if needed */
+  border: 2px solid #a0a0a0; /* Example: a thicker border for custom tables */
+}
+
+
+/* Styling for resizable tables (from Tiptap's recommendations) */
+.tiptap .tableWrapper {
+  overflow-x: auto; /* Allow horizontal scroll if table is too wide */
+}
+
+.tiptap .resize-cursor {
+  cursor: ew-resize; /* Cursor for resizing columns */
+  cursor: col-resize; /* Standard cursor for column resizing */
+}
+
+/* Styling for table resizing handles */
+.tiptap table .column-resize-handle {
+  position: absolute;
+  right: -2px; /* Position handle at the right edge of the column */
+  top: 0;
+  bottom: 0;
+  width: 4px; /* Width of the draggable handle */
+  background-color: #a0a0a0; /* Color of the handle */
+  pointer-events: all; /* Ensure the handle is clickable */
+  cursor: ew-resize; /* Resizing cursor */
+  z-index: 10; /* Ensure handle is on top */
+}
+
+/* Active state for resize handle */
+.tiptap table .column-resize-handle:hover,
+.tiptap table .column-resize-handle.active {
+  background-color: #007bff; /* Highlight on hover/active */
+}
+
+/* Styling for selected cells (optional, but good for visual feedback) */
+.tiptap .selectedCell:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 123, 255, 0.1); /* Light blue overlay for selected cells */
+  pointer-events: none; /* Allows clicks to pass through */
+  z-index: 5;
+}

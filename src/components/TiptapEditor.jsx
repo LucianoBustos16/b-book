@@ -6,11 +6,16 @@ import Turndown from 'turndown'
 import { gfm } from 'turndown-plugin-gfm'
 import TextAlign from '@tiptap/extension-text-align'
 import LinkExtension from '@tiptap/extension-link'
+// Extensiones de Tabla
+import Table from '@tiptap/extension-table'
+import TableRow from '@tiptap/extension-table-row'
+import TableHeader from '@tiptap/extension-table-header'
+import TableCell from '@tiptap/extension-table-cell'
 
 // Importar la extensión Underline de Tiptap con un alias
 import UnderlineExtension from '@tiptap/extension-underline' 
 
-// Icons de Lucide (Pilcrow y Type se mantienen porque se usan en otras partes si se añaden de nuevo, pero no en el select)
+
 import { 
   Bold, 
   Italic, 
@@ -25,8 +30,10 @@ import {
   AlignJustify,
   Link as LinkIcon, 
   Unlink,
-  Type, // Se mantiene para otros usos si fuera necesario
-  Pilcrow // Se mantiene para otros usos si fuera necesario
+  Table as TableIcon, // Nuevo ícono para insertar tabla
+  TableProperties, // Ícono para propiedades de tabla (ej. agregar columna/fila)
+  Merge, // Ícono para fusionar celdas
+  Split // Ícono para dividir celdas
 } from 'lucide-react'
 
 export default function TiptapEditor() {
@@ -62,6 +69,17 @@ const editor = useEditor({
     LinkExtension.configure({
       openInNewTab: true,
     }),
+    // Extensiones de Tabla
+    Table.configure({
+      resizable: true, // Permite redimensionar columnas
+      // Puedes añadir una clase CSS a las tablas generadas
+      HTMLAttributes: {
+        class: 'custom-tiptap-table', 
+      },
+    }),
+    TableRow,
+    TableHeader,
+    TableCell,
   ],
   content: '<p></p>',
   onUpdate: ({ editor }) => {
@@ -289,6 +307,113 @@ const editor = useEditor({
             >
               <AlignJustify size={18} />
             </button>
+
+            <div className="toolbar-separator"></div>
+
+            {/* Botones de Tabla */}
+            <button
+              onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+              className="toolbar-button"
+              title="Insertar Tabla"
+            >
+              <TableIcon size={18} />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().addColumnBefore().run()}
+              disabled={!editor.can().addColumnBefore()}
+              className="toolbar-button"
+              title="Añadir Columna Antes"
+            >
+              <TableProperties size={18} /> {/* Puedes usar un ícono más específico si tienes, o reutilizar */}
+            </button>
+            <button
+              onClick={() => editor.chain().focus().addColumnAfter().run()}
+              disabled={!editor.can().addColumnAfter()}
+              className="toolbar-button"
+              title="Añadir Columna Después"
+            >
+              <TableProperties size={18} style={{ transform: 'scaleX(-1)' }} /> {/* Para reflejar el ícono */}
+            </button>
+            <button
+              onClick={() => editor.chain().focus().deleteColumn().run()}
+              disabled={!editor.can().deleteColumn()}
+              className="toolbar-button"
+              title="Eliminar Columna"
+            >
+              🗑️ Col
+            </button> {/* Puedes usar un ícono para eliminar columna si lo encuentras */}
+            <button
+              onClick={() => editor.chain().focus().addRowBefore().run()}
+              disabled={!editor.can().addRowBefore()}
+              className="toolbar-button"
+              title="Añadir Fila Antes"
+            >
+              <TableProperties size={18} style={{ transform: 'rotate(90deg)' }} /> {/* Para reflejar el ícono */}
+            </button>
+            <button
+              onClick={() => editor.chain().focus().addRowAfter().run()}
+              disabled={!editor.can().addRowAfter()}
+              className="toolbar-button"
+              title="Añadir Fila Después"
+            >
+              <TableProperties size={18} style={{ transform: 'rotate(-90deg)' }} /> {/* Para reflejar el ícono */}
+            </button>
+            <button
+              onClick={() => editor.chain().focus().deleteRow().run()}
+              disabled={!editor.can().deleteRow()}
+              className="toolbar-button"
+              title="Eliminar Fila"
+            >
+              🗑️ Fil
+            </button> {/* Puedes usar un ícono para eliminar fila si lo encuentras */}
+            <button
+              onClick={() => editor.chain().focus().deleteTable().run()}
+              disabled={!editor.can().deleteTable()}
+              className="toolbar-button"
+              title="Eliminar Tabla"
+            >
+              <TableIcon size={18} style={{ color: 'red' }} />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().mergeCells().run()}
+              disabled={!editor.can().mergeCells()}
+              className="toolbar-button"
+              title="Fusionar Celdas"
+            >
+              <Merge size={18} />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().splitCell().run()}
+              disabled={!editor.can().splitCell()}
+              className="toolbar-button"
+              title="Dividir Celda"
+            >
+              <Split size={18} />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleHeaderColumn().run()}
+              disabled={!editor.can().toggleHeaderColumn()}
+              className={`toolbar-button ${editor.isActive('tableHeader', { col: true }) ? 'is-active' : ''}`}
+              title="Alternar Columna de Encabezado"
+            >
+              H Col
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleHeaderRow().run()}
+              disabled={!editor.can().toggleHeaderRow()}
+              className={`toolbar-button ${editor.isActive('tableHeader', { row: true }) ? 'is-active' : ''}`}
+              title="Alternar Fila de Encabezado"
+            >
+              H Fil
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleHeaderCell().run()}
+              disabled={!editor.can().toggleHeaderCell()}
+              className={`toolbar-button ${editor.isActive('tableHeader', { cell: true }) ? 'is-active' : ''}`}
+              title="Alternar Celda de Encabezado"
+            >
+              H Cel
+            </button>
           </div> {/* Fin del div.toolbar */}
 
           {/* El input del link como un tooltip */}
@@ -309,6 +434,8 @@ const editor = useEditor({
                 }}
               />
               <button onClick={applyLink}>Aplicar</button>
+
+              
             </div>
           )}
 
