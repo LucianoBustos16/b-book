@@ -411,3 +411,51 @@
   pointer-events: none; /* Allows clicks to pass through */
   z-index: 5;
 }
+
+/* Añade estos estilos a tu archivo CSS, por ejemplo, en index.css o un archivo específico de tu componente */
+
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+
+.dropdown-toggle:hover {
+    background-color: #e0e0e0;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    min-width: 150px; /* Ancho mínimo del menú */
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0;
+}
+
+.dropdown-item {
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 8px 12px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+
+.dropdown-item.is-active {
+    background-color: #e6f7ff; /* Color de fondo para la opción activa */
+    color: #1890ff; /* Color de texto para la opción activa */
+    font-weight: bold;
+}
