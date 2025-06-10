@@ -458,8 +458,16 @@
     font-size: 14px;
     color: #333;
     display: flex;
-    gap: 8px; /* Ajustado para que el gap entre icono y texto sea más consistente */
-    align-items: center; /* Centra verticalmente icono y texto */
+    gap: 8px;
+    align-items: center;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.dropdown-item svg {
+    flex-shrink: 0; 
+    min-width: 16px; 
+    height: 16px;
 }
 
 .dropdown-item:hover {
