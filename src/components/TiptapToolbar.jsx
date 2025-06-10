@@ -10,13 +10,18 @@ import {
     Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 // Iconos para los encabezados
 } from 'lucide-react';
 
+import TableGridSelector from './TableGridSelector';
+
 export default function TiptapToolbar({
     editor,
     setLink,
     unsetLink
 }) {
+
     const [showHeadingsDropdown, setShowHeadingsDropdown] = useState(false);
+    const [showTableGrid, setShowTableGrid] = useState(false); // Nuevo estado para la cuadrícula de tabla
     const dropdownRef = useRef(null);
+    const tableButtonRef = useRef(null); // Ref para el botón de la tabla
 
     if (!editor) return null;
 
@@ -25,6 +30,10 @@ export default function TiptapToolbar({
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setShowHeadingsDropdown(false);
+            }
+            if (tableButtonRef.current && !tableButtonRef.current.contains(event.target) &&
+                !event.target.closest('.table-grid-selector')) { // <-- **Esta es la línea importante para el grid selector**
+                setShowTableGrid(false);
             }
         };
 
@@ -64,6 +73,12 @@ export default function TiptapToolbar({
         if (value === 'paragraph') chain.setParagraph().run();
         else chain.toggleHeading({ level: parseInt(value[1]) }).run();
         setShowHeadingsDropdown(false); // Cierra el dropdown después de seleccionar
+    };
+
+    // Función para manejar la selección de la tabla desde la cuadrícula
+    const handleTableSelect = (rows, cols) => {
+        editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
+        setShowTableGrid(false); // Cierra la cuadrícula después de insertar
     };
 
     return (
@@ -114,6 +129,7 @@ export default function TiptapToolbar({
 
             <div className="toolbar-separator" />
 
+            
             <button onClick={() => editor.chain().focus().setTextAlign('left').run()} className={`toolbar-button ${editor.isActive({ textAlign: 'left' }) ? 'is-active' : ''}`} title="Alinear a la izquierda"><AlignLeft size={16} /></button>
             <button onClick={() => editor.chain().focus().setTextAlign('center').run()} className={`toolbar-button ${editor.isActive({ textAlign: 'center' }) ? 'is-active' : ''}`} title="Alinear al centro"><AlignCenter size={16} /></button>
             <button onClick={() => editor.chain().focus().setTextAlign('right').run()} className={`toolbar-button ${editor.isActive({ textAlign: 'right' }) ? 'is-active' : ''}`} title="Alinear a la derecha"><AlignRight size={16} /></button>
@@ -121,19 +137,21 @@ export default function TiptapToolbar({
 
             <div className="toolbar-separator" />
 
-            <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} className="toolbar-button" title="Insertar Tabla"><TableIcon size={16} /></button>
-            <button onClick={() => editor.chain().focus().addColumnBefore().run()} disabled={!editor.can().addColumnBefore()} className="toolbar-button" title="Añadir Columna Antes"><TableProperties size={16} /></button>
-            <button onClick={() => editor.chain().focus().addColumnAfter().run()} disabled={!editor.can().addColumnAfter()} className="toolbar-button" title="Añadir Columna Después"><TableProperties size={16} style={{ transform: 'scaleX(-1)' }} /></button>
-            <button onClick={() => editor.chain().focus().deleteColumn().run()} disabled={!editor.can().deleteColumn()} className="toolbar-button" title="Eliminar Columna">🗑️ Col</button>
-            <button onClick={() => editor.chain().focus().addRowBefore().run()} disabled={!editor.can().addRowBefore()} className="toolbar-button" title="Añadir Fila Antes"><TableProperties size={16} style={{ transform: 'rotate(90deg)' }} /></button>
-            <button onClick={() => editor.chain().focus().addRowAfter().run()} disabled={!editor.can().addRowAfter()} className="toolbar-button" title="Añadir Fila Después"><TableProperties size={16} style={{ transform: 'rotate(-90deg)' }} /></button>
-            <button onClick={() => editor.chain().focus().deleteRow().run()} disabled={!editor.can().deleteRow()} className="toolbar-button" title="Eliminar Fila">🗑️ Fil</button>
-            <button onClick={() => editor.chain().focus().deleteTable().run()} disabled={!editor.can().deleteTable()} className="toolbar-button" title="Eliminar Tabla"><TableIcon size={16} style={{ color: 'red' }} /></button>
-            <button onClick={() => editor.chain().focus().mergeCells().run()} disabled={!editor.can().mergeCells()} className="toolbar-button" title="Fusionar Celdas"><Merge size={16} /></button>
-            <button onClick={() => editor.chain().focus().splitCell().run()} disabled={!editor.can().splitCell()} className="toolbar-button" title="Dividir Celda"><Split size={16} /></button>
-            <button onClick={() => editor.chain().focus().toggleHeaderColumn().run()} disabled={!editor.can().toggleHeaderColumn()} className={`toolbar-button ${editor.isActive('tableHeader', { col: true }) ? 'is-active' : ''}`} title="Alternar Columna de Encabezado">H Col</button>
-            <button onClick={() => editor.chain().focus().toggleHeaderRow().run()} disabled={!editor.can().toggleHeaderRow()} className={`toolbar-button ${editor.isActive('tableHeader', { row: true }) ? 'is-active' : ''}`} title="Alternar Fila de Encabezado">H Fil</button>
-            <button onClick={() => editor.chain().focus().toggleHeaderCell().run()} disabled={!editor.can().toggleHeaderCell()} className={`toolbar-button ${editor.isActive('tableHeader', { cell: true }) ? 'is-active' : ''}`} title="Alternar Celda de Encabezado">H Cel</button>
+            {/* Botón para insertar tabla con la cuadrícula */}
+            <div className="dropdown-container" ref={tableButtonRef}> {/* Usa un nuevo ref para el botón de tabla */}
+                <button
+                    onClick={() => setShowTableGrid(!showTableGrid)}
+                    className="toolbar-button"
+                    title="Insertar Tabla"
+                >
+                    <TableIcon size={16} />
+                </button>
+                {showTableGrid && (
+                    <TableGridSelector onSelectTable={handleTableSelect} />
+                )}
+            </div>
+
+            
         </div>
     );
 }

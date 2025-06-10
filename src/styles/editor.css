@@ -459,3 +459,54 @@
     color: #1890ff; /* Color de texto para la opción activa */
     font-weight: bold;
 }
+
+
+.table-grid-selector {
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute; /* Para que aparezca debajo del botón */
+    z-index: 1000;
+}
+
+.grid-cells {
+    display: grid;
+    /* Esto es clave: usa grid-template-columns para crear las columnas */
+    grid-template-columns: repeat(var(--max-cols, 10), 20px); /* Ajusta 20px al tamaño de cada celda */
+    gap: 2px; /* Espacio entre las celdas */
+    margin-bottom: 8px;
+}
+
+.grid-row {
+    display: contents; /* Permite que las celdas de la fila se comporten como si estuvieran directamente en .grid-cells */
+}
+
+.grid-cell {
+    width: 20px; /* Ancho de cada cuadrado */
+    height: 20px; /* Alto de cada cuadrado */
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.1s ease-in-out;
+}
+
+.grid-cell.hovered {
+    background-color: #a8d4ff; /* Color azul para las celdas seleccionadas/hovered */
+    border-color: #4c9aff;
+}
+
+.grid-dimensions {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* Define la variable --max-cols en el contenedor del selector para que grid-template-columns funcione */
+.table-grid-selector {
+    --max-cols: 10; /* Debe coincidir con MAX_COLS en el JS */
+}
