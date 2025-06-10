@@ -329,11 +329,11 @@
   .editor-container {
     padding: 15px;
   }
-  
+
   .button-group {
     flex-direction: column;
   }
-  
+
   .toggle-button {
     width: 100%; /* Full width on smaller screens */
   }
@@ -415,13 +415,10 @@
   z-index: 5;
 }
 
-/* Añade estos estilos a tu archivo CSS, por ejemplo, en index.css o un archivo específico de tu componente */
-
+/* AÑADIDOS Y MODIFICADOS PARA DROPDOWNS */
 .dropdown-container {
     position: relative;
-    display: inline-block;
 }
-
 
 .dropdown-toggle:hover {
     background-color: #e0e0e0;
@@ -430,16 +427,25 @@
 .dropdown-menu {
     position: absolute;
     top: 100%;
+    /* Por defecto, abre a la izquierda. La clase 'align-right' lo sobreescribirá. */
     left: 0;
+    right: auto; /* Asegura que 'right' no esté activo por defecto */
+
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    z-index: 1000; /* Asegura que esté por encima de otros elementos */
-    min-width: 150px; /* Ancho mínimo del menú */
+    z-index: 1000;
+    min-width: 150px;
     display: flex;
     flex-direction: column;
     padding: 4px 0;
+}
+
+/* CLASE PARA ABRIR A LA DERECHA */
+.dropdown-menu.align-right {
+    left: auto; /* Desactiva el 'left: 0' */
+    right: 0;    /* Alinea el lado derecho del dropdown con el lado derecho del botón contenedor */
 }
 
 .dropdown-item {
@@ -452,7 +458,8 @@
     font-size: 14px;
     color: #333;
     display: flex;
-    gap: 2px;
+    gap: 8px; /* Ajustado para que el gap entre icono y texto sea más consistente */
+    align-items: center; /* Centra verticalmente icono y texto */
 }
 
 .dropdown-item:hover {
@@ -465,6 +472,19 @@
     font-weight: bold;
 }
 
+.dropdown-separator {
+    height: 1px;
+    background-color: #eee;
+    margin: 4px 0;
+}
+
+/* IMPORTANTE: ELIMINA estas propiedades de aquí para que la lógica de JS las controle */
+.dropdown-menu.table-edit-dropdown {
+    /* width: max-content; <-- Puedes mantener este si quieres que el ancho se ajuste al contenido más largo */
+    /* right: 0; */ /* ELIMINAR */
+    /* left: auto; */ /* ELIMINAR */
+}
+
 
 .table-grid-selector {
     padding: 10px;
@@ -475,25 +495,25 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: absolute; /* Para que aparezca debajo del botón */
+    position: absolute;
+    right: 0; /* Mantienes este si quieres que el selector de tabla siempre se abra a la derecha */
     z-index: 1000;
 }
 
 .grid-cells {
     display: grid;
-    /* Esto es clave: usa grid-template-columns para crear las columnas */
-    grid-template-columns: repeat(var(--max-cols, 10), 20px); /* Ajusta 20px al tamaño de cada celda */
-    gap: 2px; /* Espacio entre las celdas */
+    grid-template-columns: repeat(var(--max-cols, 10), 20px);
+    gap: 2px;
     margin-bottom: 8px;
 }
 
 .grid-row {
-    display: contents; /* Permite que las celdas de la fila se comporten como si estuvieran directamente en .grid-cells */
+    display: contents;
 }
 
 .grid-cell {
-    width: 20px; /* Ancho de cada cuadrado */
-    height: 20px; /* Alto de cada cuadrado */
+    width: 20px;
+    height: 20px;
     border: 1px solid #ccc;
     background-color: #f0f0f0;
     cursor: pointer;
@@ -501,7 +521,7 @@
 }
 
 .grid-cell.hovered {
-    background-color: #a8d4ff; /* Color azul para las celdas seleccionadas/hovered */
+    background-color: #a8d4ff;
     border-color: #4c9aff;
 }
 
@@ -512,28 +532,15 @@
 }
 
 /* Define la variable --max-cols en el contenedor del selector para que grid-template-columns funcione */
-.table-grid-selector {
-    --max-cols: var(--max-cols); /* Debe coincidir con MAX_COLS en el JS */
-}
-
-/* En tu CSS */
-.dropdown-separator {
-    height: 1px;
-    background-color: #eee;
-    margin: 4px 0;
-}
-
-.dropdown-menu.table-edit-dropdown{
-  width: max-content;
-  right: 0;
-  left: auto;
-}
-
+/* Esto no es estrictamente necesario aquí si ya está en :root y no lo sobrescribes */
+/* .table-grid-selector {
+    --max-cols: var(--max-cols);
+} */
 
 .insert-table-button {
     margin-top: 10px;
     padding: 8px 15px;
-    background-color: #007bff; /* Un azul típico */
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;

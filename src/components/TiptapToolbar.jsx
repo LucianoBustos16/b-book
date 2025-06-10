@@ -1,15 +1,19 @@
 // TiptapToolbar.jsx
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react'; // Importa useCallback
 import {
     Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code,
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
     Link as LinkIcon, Unlink,
-    Table as TableIcon, 
+    Table as TableIcon,
     ChevronDown,
     Pilcrow, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
     Plus,
     Trash, Trash2,
-    Settings2,     
+    Settings2,
+    // Asegúrate de importar estas si las vas a usar para las opciones de tabla comentadas
+    // Merge, // Descomentar si usas Merge
+    // Split, // Descomentar si usas Split
+    // TableProperties // Descomentar si usas TableProperties
 } from 'lucide-react';
 
 import TableGridSelector from './TableGridSelector';
@@ -21,29 +25,69 @@ export default function TiptapToolbar({
 }) {
     const [showHeadingsDropdown, setShowHeadingsDropdown] = useState(false);
     const [showTableGrid, setShowTableGrid] = useState(false);
-    const [showTableEditDropdown, setShowTableEditDropdown] = useState(false); // **NUEVO ESTADO**
-    const dropdownRef = useRef(null); // Ref para dropdown de estilos de texto
-    const tableInsertButtonRef = useRef(null); // Ref para el botón de insertar tabla
-    const tableEditDropdownRef = useRef(null); // **NUEVO REF para el dropdown de edición de tabla**
+    const [showTableEditDropdown, setShowTableEditDropdown] = useState(false);
+
+    // Refs para los CONTENEDORES de los dropdowns (para el handleClickOutside)
+    // El 'dropdownRef' original debe ser más específico, lo renombramos a headingsDropdownRef
+    const headingsDropdownRef = useRef(null);
+    const tableInsertButtonRef = useRef(null);
+    const tableEditDropdownRef = useRef(null);
+
+    // Refs para los MENÚS de los dropdowns (para medir su ancho con offsetWidth)
+    const headingsMenuRef = useRef(null);
+    const tableEditMenuRef = useRef(null);
+
+    // Estados para la dirección de apertura de los dropdowns
+    const [headingsDropdownDirection, setHeadingsDropdownDirection] = useState('left');
+    const [tableEditDropdownDirection, setTableEditDropdownDirection] = useState('left');
 
 
     if (!editor) return null;
+
+    // Función para calcular la dirección de un dropdown
+    const calculateDropdownDirection = useCallback((buttonRef, menuRef, setDirection) => {
+        if (buttonRef.current && menuRef.current) {
+            const buttonRect = buttonRef.current.getBoundingClientRect();
+            const menuWidth = menuRef.current.offsetWidth;
+            const viewportWidth = window.innerWidth;
+
+            // Calcula si hay suficiente espacio a la derecha
+            const spaceRight = viewportWidth - buttonRect.right;
+            // Calcula si hay suficiente espacio a la izquierda (desde el inicio del botón)
+            // Se calcula desde la posición izquierda del botón
+            const spaceLeft = buttonRect.left;
+
+            // Define un margen mínimo (ej. 10px) para no pegar el dropdown al borde
+            const margin = 10;
+
+            // Lógica: Si no hay suficiente espacio a la derecha PARA EL MENÚ (menuWidth + margin)
+            // Y hay suficiente espacio a la izquierda (spaceLeft >= menuWidth + margin)
+            // Entonces, abrimos a la derecha. De lo contrario, por defecto a la izquierda.
+            if (spaceRight < (menuWidth + margin) && spaceLeft >= (menuWidth + margin)) {
+                setDirection('right'); // Abrir a la derecha (alineado al borde derecho del botón)
+            } else {
+                setDirection('left'); // Por defecto o si hay espacio a la izquierda, abrir a la izquierda
+            }
+        }
+    }, []); // Dependencias vacías porque no depende de props o estados internos
+
 
     // Lógica para cerrar dropdowns al hacer clic fuera
     useEffect(() => {
         const handleClickOutside = (event) => {
             // Cierra el dropdown de encabezados
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            if (headingsDropdownRef.current && !headingsDropdownRef.current.contains(event.target)) {
                 setShowHeadingsDropdown(false);
             }
 
             // Cierra la cuadrícula de tabla de inserción
             if (tableInsertButtonRef.current && !tableInsertButtonRef.current.contains(event.target) &&
+                // Asegúrate de que el clic no fue dentro del TableGridSelector
                 !event.target.closest('.table-grid-selector')) {
                 setShowTableGrid(false);
             }
 
-            // **Cierra el dropdown de edición de tabla**
+            // Cierra el dropdown de edición de tabla
             if (tableEditDropdownRef.current && !tableEditDropdownRef.current.contains(event.target)) {
                 setShowTableEditDropdown(false);
             }
@@ -55,8 +99,32 @@ export default function TiptapToolbar({
         };
     }, []);
 
+
+    // Manejadores para alternar la visibilidad y calcular la dirección
+    const toggleHeadingsDropdown = () => {
+        const newState = !showHeadingsDropdown;
+        setShowHeadingsDropdown(newState);
+        if (newState) {
+            // Un pequeño retraso para que el menú se renderice antes de medirlo
+            setTimeout(() => {
+                calculateDropdownDirection(headingsDropdownRef, headingsMenuRef, setHeadingsDropdownDirection);
+            }, 0);
+        }
+    };
+
+    const toggleTableEditDropdown = () => {
+        const newState = !showTableEditDropdown;
+        setShowTableEditDropdown(newState);
+        if (newState) {
+            // Un pequeño retraso para que el menú se renderice antes de medirlo
+            setTimeout(() => {
+                calculateDropdownDirection(tableEditDropdownRef, tableEditMenuRef, setTableEditDropdownDirection);
+            }, 0);
+        }
+    };
+
     const headingOptions = [
-        { value: 'paragraph', label: 'Párrafo', icon: <Pilcrow  size={16} /> },
+        { value: 'paragraph', label: 'Párrafo', icon: <Pilcrow size={16} /> },
         { value: 'h1', label: 'Título 1', icon: <Heading1 size={16} /> },
         { value: 'h2', label: 'Título 2', icon: <Heading2 size={16} /> },
         { value: 'h3', label: 'Título 3', icon: <Heading3 size={16} /> },
@@ -73,7 +141,7 @@ export default function TiptapToolbar({
                 return editor.isActive('heading', { level: parseInt(option.value[1]) });
             }
         });
-        return activeOption ? activeOption.icon : <Pilcrow  size={16} />;
+        return activeOption ? activeOption.icon : <Pilcrow size={16} />;
     };
 
     const applyHeadingStyle = (value) => {
@@ -93,16 +161,20 @@ export default function TiptapToolbar({
     return (
         <div className="toolbar">
             {/* Dropdown de estilos de texto */}
-            <div className="dropdown-container" ref={dropdownRef}>
+            {/* Se usa headingsDropdownRef para el contenedor y headingsMenuRef para el menú */}
+            <div className="dropdown-container" ref={headingsDropdownRef}>
                 <button
-                    onClick={() => setShowHeadingsDropdown(!showHeadingsDropdown)}
+                    onClick={toggleHeadingsDropdown}
                     className="toolbar-button dropdown-toggle"
                     title="Estilos de texto"
                 >
                     {getActiveHeadingIcon()} <ChevronDown size={14} />
                 </button>
                 {showHeadingsDropdown && (
-                    <div className="dropdown-menu">
+                    <div
+                        className={`dropdown-menu ${headingsDropdownDirection === 'right' ? 'align-right' : ''}`}
+                        ref={headingsMenuRef} // Ref para el MENÚ
+                    >
                         {headingOptions.map(option => (
                             <button
                                 key={option.value}
@@ -167,22 +239,25 @@ export default function TiptapToolbar({
             {isTableActive && (
                 <div className="dropdown-container" ref={tableEditDropdownRef}>
                     <button
-                        onClick={() => setShowTableEditDropdown(!showTableEditDropdown)}
-                        className="toolbar-button dropdown-toggle" // Puedes usar dropdown-toggle si quieres la flecha
+                        onClick={toggleTableEditDropdown} // Usa el nuevo manejador para calcular la dirección
+                        className="toolbar-button dropdown-toggle"
                         title="Opciones de Tabla"
                     >
-                        <Settings2 size={16} /> {/* O EllipsisVertical si prefieres un icono de "más" */}
-                        <ChevronDown size={14} /> {/* Opcional: para indicar que es un dropdown */}
+                        <Settings2 size={16} />
+                        <ChevronDown size={14} />
                     </button>
                     {showTableEditDropdown && (
-                        <div className="dropdown-menu table-edit-dropdown">
+                        <div
+                            className={`dropdown-menu table-edit-dropdown ${tableEditDropdownDirection === 'right' ? 'align-right' : ''}`}
+                            ref={tableEditMenuRef} // Ref para el MENÚ de edición de tabla
+                        >
                             <button
                                 onClick={() => { editor.chain().focus().addColumnBefore().run(); setShowTableEditDropdown(false); }}
                                 disabled={!editor.can().addColumnBefore()}
                                 className="dropdown-item"
                                 title="Añadir columna a la izquierda">
                                 <Plus size={16} />
-                                Añadir columna a la izquierda                           
+                                Añadir columna a la izquierda
                             </button>
 
                             <button
@@ -203,14 +278,14 @@ export default function TiptapToolbar({
                                 Eliminar Columna
                             </button>
 
-                            <div className="dropdown-separator" /> {/* Separador opcional */}
+                            <div className="dropdown-separator" />
 
                             <button
                                 onClick={() => { editor.chain().focus().addRowBefore().run(); setShowTableEditDropdown(false); }}
                                 disabled={!editor.can().addRowBefore()}
                                 className="dropdown-item"
                                 title="Añadir fila encima">
-                                <Plus size={16}/>
+                                <Plus size={16} />
                                 Añadir fila encima
                             </button>
 
@@ -242,9 +317,16 @@ export default function TiptapToolbar({
                                 <Trash2 size={16} style={{ color: 'red' }} />
                                 Eliminar Tabla
                             </button>
-                            {/* <div className="dropdown-separator" />
+                            {/* Opciones comentadas... DESCOMENTA Y AÑADE LAS IMPORTACIONES DE LUCIDE-REACT SI LAS USAS */}
+                            {/*
+                            <div className="dropdown-separator" />
                             <button onClick={() => { editor.chain().focus().mergeCells().run(); setShowTableEditDropdown(false); }} disabled={!editor.can().mergeCells()} className={`dropdown-item ${editor.isActive('mergeCells') ? 'is-active' : ''}`} title="Fusionar Celdas"><Merge size={16} /> Fusionar Celdas</button>
-                            <button onClick={() => { editor.chain().focus().splitCell().run(); setShowTableEditDropdown(false); }} disabled={!editor.can().splitCell()} className={`dropdown-item ${editor.isActive('splitCell') ? 'is-active' : ''}`} title="Dividir Celda"><Split size={16} /> Dividir Celda</button> */}
+                            <button onClick={() => { editor.chain().focus().splitCell().run(); setShowTableEditDropdown(false); }} disabled={!editor.can().splitCell()} className={`dropdown-item ${editor.isActive('splitCell') ? 'is-active' : ''}`} title="Dividir Celda"><Split size={16} /> Dividir Celda</button>
+                            <div className="dropdown-separator" />
+                            <button onClick={() => { editor.chain().focus().toggleHeaderColumn().run(); setShowTableEditDropdown(false); }} disabled={!editor.can().toggleHeaderColumn()} className={`dropdown-item ${editor.isActive('tableHeader', { col: true }) ? 'is-active' : ''}`} title="Alternar Columna de Encabezado"><TableProperties size={16} /> H Col</button>
+                            <button onClick={() => { editor.chain().focus().toggleHeaderRow().run(); setShowTableEditDropdown(false); }} disabled={!editor.can().toggleHeaderRow()} className={`dropdown-item ${editor.isActive('tableHeader', { row: true }) ? 'is-active' : ''}`} title="Alternar Fila de Encabezado"><TableProperties size={16} /> H Fil</button>
+                            <button onClick={() => { editor.chain().focus().toggleHeaderCell().run(); setShowTableEditDropdown(false); }} disabled={!editor.can().toggleHeaderCell()} className={`dropdown-item ${editor.isActive('tableHeader', { cell: true }) ? 'is-active' : ''}`} title="Alternar Celda de Encabezado"><TableProperties size={16} /> H Cel</button>
+                            */}
                         </div>
                     )}
                 </div>
