@@ -1,3 +1,6 @@
+:root{
+  --max-cols: 10;
+}
 /*------------------------------------*\
   #BASE STYLES & LAYOUT
 \*------------------------------------*/
@@ -448,6 +451,8 @@
     cursor: pointer;
     font-size: 14px;
     color: #333;
+    display: flex;
+    gap: 2px;
 }
 
 .dropdown-item:hover {
@@ -508,5 +513,35 @@
 
 /* Define la variable --max-cols en el contenedor del selector para que grid-template-columns funcione */
 .table-grid-selector {
-    --max-cols: 10; /* Debe coincidir con MAX_COLS en el JS */
+    --max-cols: var(--max-cols); /* Debe coincidir con MAX_COLS en el JS */
+}
+
+/* En tu CSS */
+.dropdown-separator {
+    height: 1px;
+    background-color: #eee;
+    margin: 4px 0;
+}
+
+.dropdown-menu.table-edit-dropdown{
+  width: max-content;
+  right: 0;
+  left: auto;
+}
+
+
+.insert-table-button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background-color: #007bff; /* Un azul típico */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.insert-table-button:hover {
+    background-color: #0056b3;
 }
