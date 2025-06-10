@@ -4,7 +4,7 @@ import {
     Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code,
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
     Link as LinkIcon, Unlink,
-    Table as TableIcon,
+    Table as TableIcon, Columns3Cog,
     ChevronDown,
     Pilcrow, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
     Plus,
@@ -243,7 +243,7 @@ export default function TiptapToolbar({
                         className="toolbar-button dropdown-toggle"
                         title="Opciones de Tabla"
                     >
-                        <Settings2 size={16} />
+                        <Columns3Cog size={16} />
                         <ChevronDown size={14} />
                     </button>
                     {showTableEditDropdown && (
