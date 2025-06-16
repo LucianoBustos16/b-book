@@ -1,6 +1,6 @@
 ---
 import { getAuth } from "@clerk/astro/server";
-import { SignIn, SignOutButton, UserButton } from "@clerk/astro/components"; // Assuming these components exist
+import { SignOutButton, UserButton } from "@clerk/astro/components"; // Assuming these components exist
 
 const auth = await getAuth(Astro.request);
 const userId = auth?.userId;
