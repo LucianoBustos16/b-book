@@ -1,0 +1,40 @@
+---
+import { getAuth } from "@clerk/astro/server";
+import { SignIn, SignOutButton, UserButton } from "@clerk/astro/components"; // Assuming these components exist
+
+const auth = await getAuth(Astro.request);
+const userId = auth?.userId;
+---
+
+<div class="auth-controls">
+  {userId ? (
+    <>
+      <UserButton client:load />
+      {/* SignOutButton might need client:visible or client:load if it has JS interaction */}
+      {/* <SignOutButton client:load /> */}
+    </>
+  ) : (
+    // If Clerk middleware is correctly configured, users shouldn't see this on protected routes.
+    // This could be a fallback or for explicitly public pages with optional sign-in.
+    // <SignIn client:load />
+    <a href="/sign-in">Sign In (Fallback)</a>
+  )}
+</div>
+
+<style>
+  .auth-controls {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+    display: flex;
+    gap: 1rem; /* Increased gap for better spacing */
+    align-items: center;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.9); /* Optional: for better visibility */
+    border-radius: 8px; /* Optional: for aesthetics */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: for aesthetics */
+  }
+  /* Clerk components usually come with their own styling. */
+  /* Add :global styles if needed to override Clerk's default styles */
+</style>
